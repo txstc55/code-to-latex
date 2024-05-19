@@ -24,7 +24,7 @@
       </div>
       <textarea
         id="codearea"
-        class="w-96 h-96 border-2 border-black p-2 font-mono"
+        class="w-96 h-96 border-2 border-black p-2 font-mono text-xs"
         v-model="codeText"
       ></textarea>
       <div class="font-mono text-black mt-5 mb-3 text-center">
@@ -32,7 +32,7 @@
       </div>
       <div
         id="previewArea"
-        class="w-96 h-full min-h-10 whitespace-pre-wrap mb-10 font-mono break-words"
+        class="w-96 h-full min-h-10 whitespace-pre-wrap mb-10 font-mono break-words text-xs"
         :style="textareaStyle"
         v-html="reconstructedHtml"
       ></div>

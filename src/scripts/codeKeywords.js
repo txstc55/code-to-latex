@@ -34,9 +34,12 @@ class codeKeywords {
 
   // check is in keywords list
   checkInKeywords(word) {
-    return (
-      this.keywords.includes(word) || this.additionalKeywords.includes(word)
-    );
+    if (this.keywords.includes(word)) {
+      return 1;
+    } else if (this.additionalKeywords.includes(word)) {
+      return 2;
+    }
+    return 0;
   }
 
   // check if is an emphasis keyword

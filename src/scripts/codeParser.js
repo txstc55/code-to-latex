@@ -284,6 +284,39 @@ class codeParser {
           start = child.endIndex;
         }
         needSpanEnd = false;
+      } else if (nodeType == "unary_operator") {
+        // take care of the unary operator
+        const child = node.child(0); // unary operator's first child is the operator itself
+        const chosenColor =
+          node.child(1).type == "float" || node.child(1).type == "integer"
+            ? codeStyle.colors.numberColor.value
+            : codeStyle.colors.operatorColor.value;
+        const chosenSymbol =
+          node.child(1).type == "float" || node.child(1).type == "integer"
+            ? "?@"
+            : "@*";
+        const chosenLastDelimSymbol =
+          node.child(1).type == "float" || node.child(1).type == "integer"
+            ? "@?"
+            : "*@";
+        const chosenColorText =
+          node.child(1).type == "float" || node.child(1).type == "integer"
+            ? "pythonNumberColor"
+            : "pythonOperatorColor";
+
+        htmlText += "<span style='color: " + chosenColor + "'>";
+        latexText += inLiterate ? "" : chosenSymbol;
+        lastDelimSymbol = inLiterate ? "" : chosenLastDelimSymbol;
+        literateText += inLiterate ? `\\color{${chosenColorText}}{` : "";
+        htmlText += this.codeText.slice(start, child.startIndex);
+        latexText += this.codeText.slice(start, child.startIndex);
+        traverse(child, child.startIndex, nodeType, inLiterate);
+        htmlText += "</span>";
+        latexText += lastDelimSymbol;
+        literateText += inLiterate ? "}\\color{pythonBaseColor}" : "";
+        start = child.endIndex;
+        needSpanEnd = false;
+        i = 1; // progress the child index
       } else if (nodeType == "decorator") {
         htmlText +=
           "<span style='color: " + codeStyle.colors.decoratorColor.value + "'>";

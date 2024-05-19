@@ -115,6 +115,7 @@ export default {
       codeText: "",
       htmlText: "",
       latexText: "",
+      literateText: "",
       themes: [],
       selectedFile: "",
     };
@@ -143,6 +144,7 @@ export default {
       );
       this.htmlText = reconstructed.html;
       this.latexText = reconstructed.latex;
+      this.literateText = reconstructed.literate;
       return this.htmlText;
     },
   },
@@ -154,7 +156,7 @@ export default {
 
   methods: {
     downloadLatex() {
-      const latexStyle = this.style.toLatex();
+      const latexStyle = this.style.toLatex(this.literateText);
       var styleBlob = new Blob([latexStyle], { type: "text/plain" });
       var url = URL.createObjectURL(styleBlob);
       var a = document.createElement("a");

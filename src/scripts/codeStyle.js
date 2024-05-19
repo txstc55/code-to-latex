@@ -81,7 +81,7 @@ class codeStyle {
     return `${c.toFixed(2)}, ${m.toFixed(2)}, ${y.toFixed(2)}, ${k.toFixed(2)}`;
   }
 
-  toLatex() {
+  toLatex(literateText = "") {
     let latexText =
       "\\usepackage{listings}\n\\usepackage{xcolor}\n\\usepackage[most]{tcolorbox}\n\\usepackage{fontspec}\n\\selectcolormodel{rgb}\n";
     for (const [_, value] of Object.entries(this.colors)) {
@@ -117,6 +117,7 @@ class codeStyle {
       "emph={}, % add to this list to change color for emphasized text\n";
     latexText +=
       "emphstyle=\\color{pythonKeywordColor}, % change this to change the color for emphasized text\n";
+    latexText += literateText;
     latexText += "}\n\n";
 
     latexText += `\\newtcblisting{pythonBlock}[1]{%`;

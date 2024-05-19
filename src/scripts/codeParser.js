@@ -125,6 +125,33 @@ class codeParser {
       } else if (nodeType == "string") {
         htmlText +=
           "<span style='color: " + codeStyle.colors.stringColor.value + "'>";
+        for (i; i < node.childCount; i++) {
+          const child = node.child(i);
+          const childIsNotString =
+            child.type != "string_content" &&
+            child.type != "string_start" &&
+            child.type != "string_end";
+          // Append the htmlText between the previous end and the start of the current child
+          if (childIsNotString) {
+            htmlText +=
+              "</span><span style='color: " +
+              codeStyle.colors.baseColor.value +
+              "'>";
+          }
+          htmlText += this.codeText.slice(start, child.startIndex);
+          latexText += this.codeText.slice(start, child.startIndex);
+          // Recursively process the child
+          traverse(child, child.startIndex, nodeType);
+          if (childIsNotString) {
+            htmlText +=
+              "</span><span style='color: " +
+              codeStyle.colors.stringColor.value +
+              "'>";
+          }
+          // Update the start index to the end of the current child
+          start = child.endIndex;
+        }
+
         needSpanEnd = true;
       } else if (nodeType == "call") {
         // color for function call

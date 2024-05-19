@@ -81,7 +81,7 @@ class codeStyle {
     return `${c.toFixed(2)}, ${m.toFixed(2)}, ${y.toFixed(2)}, ${k.toFixed(2)}`;
   }
 
-  toLatex(literateText = "") {
+  toLatex(literateText = "", additionalKeywords = []) {
     let latexText =
       "\\usepackage{listings}\n\\usepackage{xcolor}\n\\usepackage[most]{tcolorbox}\n\\usepackage{fontspec}\n\\selectcolormodel{rgb}\n";
     for (const [_, value] of Object.entries(this.colors)) {
@@ -104,7 +104,7 @@ class codeStyle {
     latexText += `showtabs=false, % do we indicate tabs within strings\n`;
     latexText += `tabsize=4, % sets default tabsize to 4 spaces\n`;
     latexText += `xleftmargin=0pt, % sets the margin on left side\n`;
-    latexText += `otherkeywords={}, % add to this list if you want to add other keywords\n`;
+    latexText += `otherkeywords={${additionalKeywords.join(", ")}}, % add to this list if you want to add other keywords\n`;
     latexText += `moredelim=[is][\\color{pythonParameterColor}]{|@}{@|},  % Anything between |@ @| strings will have parameter color\n`;
     latexText += `moredelim=[is][\\color{pythonFunctionColor}]{*|}{|*},  % Anything between *| |* strings will have function color\n`;
     latexText += `moredelim=[is][\\color{pythonCallColor}]{|!}{!|},  % Anything between |! !| strings will have call color\n`;
@@ -112,6 +112,7 @@ class codeStyle {
     latexText += `moredelim=[is][\\color{pythonNumberColor}]{?@}{@?},  % Anything between ?@ @? strings will have number color\n`;
     latexText += `moredelim=[is][\\color{pythonOperatorColor}]{@*}{*@},  % Anything between @* *@ strings will have operator color\n`;
     latexText += `moredelim=[is][\\color{pythonDecoratorColor}]{?*}{*?},  % Anything between ?* *? strings will have decorator color\n`;
+    latexText += `moredelim=[is][\\color{pythonKeywordColor}]{!@}{@!},  % Anything between !@ @! strings will have keyword color\n`;
 
     latexText +=
       "emph={}, % add to this list to change color for emphasized text\n";

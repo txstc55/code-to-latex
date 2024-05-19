@@ -156,7 +156,7 @@ export default {
 
   methods: {
     downloadLatex() {
-      const latexStyle = this.style.toLatex(this.literateText);
+      const latexStyle = this.style.toLatex(this.literateText, this.keywords.additionalKeywords);
       var styleBlob = new Blob([latexStyle], { type: "text/plain" });
       var url = URL.createObjectURL(styleBlob);
       var a = document.createElement("a");

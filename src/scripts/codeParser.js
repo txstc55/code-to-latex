@@ -142,6 +142,27 @@ class codeParser {
           }
         }
         needSpanEnd = false;
+      } else if (nodeType == "class_definition") {
+        // for class definition we need to highlight the identifier
+        // function definition
+        for (i; i < node.childCount; i++) {
+          const child = node.child(i);
+          if (child.type == "identifier") {
+            htmlText +=
+              "<span style='color: " +
+              codeStyle.colors.functionColor.value +
+              "'>";
+            latexText += "*|";
+          }
+          htmlText += this.codeText.slice(start, child.startIndex);
+          latexText += this.codeText.slice(start, child.startIndex);
+          traverse(child, child.startIndex, nodeType, inLiterate);
+          start = child.endIndex;
+          if (child.type == "identifier") {
+            htmlText += "</span>";
+            latexText += "|*";
+          }
+        }
       } else if (nodeType == "string") {
         htmlText +=
           "<span style='color: " + codeStyle.colors.stringColor.value + "'>";
@@ -323,11 +344,23 @@ class codeParser {
         latexText += "?*";
         lastDelimSymbol = "*?";
         needSpanEnd = true;
-      } else if (codeKeywords.checkInKeywords(nodeType)) {
-        // color for keywords
-        htmlText +=
-          "<span style='color: " + codeStyle.colors.keywordColor.value + "'>";
-        needSpanEnd = true;
+      } else if (codeKeywords.checkInKeywords(nodeType) > 0) {
+        if (codeKeywords.checkInKeywords(nodeType) == 1) {
+          // color for keywords
+          htmlText +=
+            "<span style='color: " + codeStyle.colors.keywordColor.value + "'>";
+          needSpanEnd = true;
+        } else if (codeKeywords.checkInKeywords(nodeType) == 2) {
+          // it is a keyword that is not in default listing package
+          // we have added it to the additional keywords list
+          // but we will need to annotate it
+          htmlText +=
+            "<span style='color: " + codeStyle.colors.keywordColor.value + "'>";
+          latexText += inLiterate ? "" : "!@";
+          lastDelimSymbol = inLiterate ? "" : "@!";
+          literateText += inLiterate ? "\\color{pythonKeywordColor}{" : "";
+          needSpanEnd = true;
+        }
       } else {
         needSpanEnd = false;
       }

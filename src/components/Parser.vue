@@ -205,7 +205,7 @@ export default {
     async loadStyle() {
       if (this.selectedFile) {
         try {
-          const filePath = `/assets/${this.selectedFile}`;
+          const filePath = `${process.env.BASE_URL}assets/${this.selectedFile}`;
           const response = await fetch(filePath);
           if (response.ok) {
             this.jsonContent = await response.json();

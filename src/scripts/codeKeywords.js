@@ -2,7 +2,7 @@ class codeKeywords {
   constructor() {
     // list of keywords in listing package
     this.keywords = [];
-    this.additionalKeywords = ["true", "false", "null", "class", "as"];
+    this.additionalKeywords = ["true", "false", "null", "class", "as", "none"];
     this.emphasis0 = [];
     this.emphasis1 = [];
     this.emphasis2 = [];

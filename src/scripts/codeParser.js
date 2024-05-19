@@ -8,6 +8,22 @@ class codeParser {
     this.latexText = "";
   }
 
+  escapeLatexSpecialChars(string) {
+    const specialChars = {
+      "#": "\\#",
+      $: "\\$",
+      "%": "\\%",
+      "&": "\\&",
+      _: "\\_",
+      "{": "\\{",
+      "}": "\\}",
+      "~": "\\textasciitilde{}",
+      "^": "\\textasciicircum{}",
+      "\\": "\\textbackslash{}",
+    };
+    return string.replace(/[#$%&_{}~^\\]/g, (match) => specialChars[match]);
+  }
+
   async init() {
     // Load and initialize the parser
     await TreeSitter.init();
@@ -70,8 +86,9 @@ class codeParser {
     let latexText =
       "\\documentclass{article}\n\\input{pythonStyle.tex}\n\\title{Code}\n\\author{txstc55}\n\\begin{document}\n\\maketitle\n";
     latexText += "\\begin{pythonBlock}{}\n";
+    let literateText = "literate=%\n";
     // Helper function to traverse nodes
-    const traverse = (node, start, parentType) => {
+    const traverse = (node, start, parentType, needsLiterate = false) => {
       // htmlText += node.type + "{";
       const nodeType = node.type;
       // print(nodeType);
@@ -89,7 +106,8 @@ class codeParser {
               "<span style='color: " +
               codeStyle.colors.parameterColor.value +
               "'>";
-            latexText += "|@";
+            // technically needsLiterate will never be true here
+            latexText += needsLiterate ? "" : "|@";
           }
           htmlText += this.codeText.slice(start, child.startIndex);
           latexText += this.codeText.slice(start, child.startIndex);
@@ -97,7 +115,7 @@ class codeParser {
           start = child.endIndex;
           if (child.type == "identifier") {
             htmlText += "</span>";
-            latexText += "@|";
+            latexText += needsLiterate ? "" : "@|";
           }
         }
         needSpanEnd = false;
@@ -110,7 +128,7 @@ class codeParser {
               "<span style='color: " +
               codeStyle.colors.functionColor.value +
               "'>";
-            latexText += "*|";
+            latexText += needsLiterate ? "" : "*|";
           }
           htmlText += this.codeText.slice(start, child.startIndex);
           latexText += this.codeText.slice(start, child.startIndex);
@@ -118,13 +136,30 @@ class codeParser {
           start = child.endIndex;
           if (child.type == "identifier") {
             htmlText += "</span>";
-            latexText += "|*";
+            latexText += needsLiterate ? "" : "|*";
           }
         }
         needSpanEnd = false;
       } else if (nodeType == "string") {
         htmlText +=
           "<span style='color: " + codeStyle.colors.stringColor.value + "'>";
+        for (i; i < node.childCount; i++) {
+          const child = node.child(i);
+          if (child.type != "string_content") {
+            literateText +=
+              "{" +
+              this.codeText.slice(child.startIndex, child.endIndex) +
+              "}{{{";
+          }
+          htmlText += this.codeText.slice(start, child.startIndex);
+          latexText += this.codeText.slice(start, child.startIndex);
+          traverse(child, child.startIndex, nodeType, (needsLiterate = true));
+          // Update the start index to the end of the current child
+          start = child.endIndex;
+          if (child.type != "string_content") {
+            literateText += "}}}" + (child.endIndex - child.startIndex) + "\n";
+          }
+        }
         needSpanEnd = true;
       } else if (nodeType == "call") {
         // color for function call
@@ -135,12 +170,17 @@ class codeParser {
           const child = node.child(0);
           htmlText +=
             "<span style='color: " + codeStyle.colors.callColor.value + "'>";
-          latexText += "|!";
+          latexText += needsLiterate ? "" : "|!";
+          literateText += needsLiterate ? "\\color{pythonCallColor}{" : "";
           htmlText += this.codeText.slice(start, child.startIndex);
           latexText += this.codeText.slice(start, child.startIndex);
+          literateText += needsLiterate
+            ? this.codeText.slice(start, child.startIndex) +
+              "}\\color{pythonStringColor}"
+            : "";
           traverse(child, child.startIndex, nodeType);
           htmlText += "</span>";
-          latexText += "!|";
+          latexText += needsLiterate ? "" : "!|";
           i = 1;
           start = child.endIndex;
         }
@@ -151,6 +191,9 @@ class codeParser {
           const child = node.child(i);
           htmlText += this.codeText.slice(start, child.startIndex);
           latexText += this.codeText.slice(start, child.startIndex);
+          literateText += needsLiterate
+            ? this.codeText.slice(start, child.startIndex)
+            : "";
           traverse(child, child.startIndex, nodeType);
           start = child.endIndex;
         }
@@ -160,18 +203,24 @@ class codeParser {
         if (parentType == "call") {
           htmlText +=
             "<span style='color: " + codeStyle.colors.callColor.value + "'>";
-          latexText += "|!";
-          lastDelimSymbol = "!|";
+          latexText += needsLiterate ? "" : "|!";
+          literateText += needsLiterate ? "\\color{pythonCallColor}{" : "";
+          lastDelimSymbol = needsLiterate ? "" : "!|";
         } else {
           htmlText +=
             "<span style='color: " +
             codeStyle.colors.attributeColor.value +
             "'>";
-          latexText += "|?";
-          lastDelimSymbol = "?|";
+          latexText += needsLiterate ? "" : "|?";
+          literateText += needsLiterate ? "\\color{pythonAttributeColor}{" : "";
+          lastDelimSymbol = needsLiterate ? "" : "?|";
         }
 
         htmlText += this.codeText.slice(start, child.startIndex);
+        latexText += this.codeText.slice(start, child.startIndex);
+        literateText += needsLiterate
+          ? this.codeText.slice(start, child.startIndex) + "}"
+          : "";
         traverse(child, child.startIndex, nodeType);
         htmlText += "</span>";
         latexText += lastDelimSymbol;
@@ -182,8 +231,8 @@ class codeParser {
         // color for number
         htmlText +=
           "<span style='color: " + codeStyle.colors.numberColor.value + "'>";
-        latexText += "?@";
-        lastDelimSymbol = "@?";
+        latexText += needsLiterate ? "" : "?@";
+        lastDelimSymbol = needsLiterate ? "" : "@?";
         needSpanEnd = true;
       } else if (nodeType == "comment") {
         // color for comment
@@ -199,8 +248,8 @@ class codeParser {
               "<span style='color: " +
               codeStyle.colors.operatorColor.value +
               "'>";
-            latexText += "@*";
-            lastDelimSymbol = "*@";
+            latexText += needsLiterate ? "" : "@*";
+            lastDelimSymbol = needsLiterate ? "" : "*@";
           }
           htmlText += this.codeText.slice(start, child.startIndex);
           latexText += this.codeText.slice(start, child.startIndex);
@@ -215,8 +264,8 @@ class codeParser {
       } else if (nodeType == "decorator") {
         htmlText +=
           "<span style='color: " + codeStyle.colors.decoratorColor.value + "'>";
-        latexText += "?*";
-        lastDelimSymbol = "*?";
+        latexText += needsLiterate ? "" : "?*";
+        lastDelimSymbol = needsLiterate ? "" : "*?";
         needSpanEnd = true;
       } else if (codeKeywords.checkInKeywords(nodeType)) {
         // color for keywords
@@ -231,6 +280,9 @@ class codeParser {
         // Append the htmlText between the previous end and the start of the current child
         htmlText += this.codeText.slice(start, child.startIndex);
         latexText += this.codeText.slice(start, child.startIndex);
+        literateText += needsLiterate
+          ? this.codeText.slice(start, child.startIndex)
+          : "";
         // Recursively process the child
         traverse(child, child.startIndex, nodeType);
         // Update the start index to the end of the current child
@@ -239,15 +291,18 @@ class codeParser {
       // Append the htmlText from the last child to the end of the current node
       htmlText += this.codeText.slice(start, node.endIndex);
       latexText += this.codeText.slice(start, node.endIndex);
+      literateText += needsLiterate
+        ? this.codeText.slice(start, node.endIndex)
+        : "";
       if (needSpanEnd) {
         htmlText += "</span>";
-        latexText += lastDelimSymbol;
+        latexText += needsLiterate ? "" : lastDelimSymbol;
       }
     };
     // Start the traversal from the root node
     traverse(node, node.startIndex, node.type);
     latexText += "\n\\end{pythonBlock}\n\\end{document}\n";
-    return { html: htmlText, latex: latexText };
+    return { html: htmlText, latex: latexText, literate: literateText };
   }
 }
 

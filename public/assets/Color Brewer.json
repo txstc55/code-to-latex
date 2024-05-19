@@ -1,0 +1,81 @@
+{
+  "colors": {
+    "backgroundColor": {
+      "name": "Background Color",
+      "value": "#ffffff"
+    },
+    "borderColor": {
+      "name": "Border Color",
+      "value": "#17486e"
+    },
+    "baseColor": {
+      "name": "Base Color",
+      "value": "#000000"
+    },
+    "keywordColor": {
+      "name": "Keyword Color",
+      "value": "#2a77b5"
+    },
+    "stringColor": {
+      "name": "String Color",
+      "value": "#736aaf"
+    },
+    "parameterColor": {
+      "name": "Parameter Color",
+      "value": "#2b994a"
+    },
+    "functionColor": {
+      "name": "Function Color",
+      "value": "#2a77b5"
+    },
+    "callColor": {
+      "name": "Call Color",
+      "value": "#e24909"
+    },
+    "attributeColor": {
+      "name": "Attribute Color",
+      "value": "#de520c"
+    },
+    "numberColor": {
+      "name": "Number Color",
+      "value": "#2b994a"
+    },
+    "commentColor": {
+      "name": "Comment Color",
+      "value": "#636363"
+    },
+    "operatorColor": {
+      "name": "Operator Color",
+      "value": "#000000"
+    },
+    "decoratorColor": {
+      "name": "Decorator Color",
+      "value": "#585858"
+    }
+  },
+  "sizes": {
+    "borderWidth": {
+      "name": "Border Width",
+      "value": "0.96",
+      "min": "0",
+      "max": "9",
+      "step": "0.01"
+    },
+    "borderRadius": {
+      "name": "Border Radius",
+      "value": "2.44",
+      "min": "0",
+      "max": "9",
+      "step": "0.01"
+    },
+    "lineHeight": {
+      "name": "Line Height",
+      "value": "0.8",
+      "min": "0",
+      "max": "2",
+      "step": "0.01"
+    }
+  },
+  "pt2px": 1.3333333333333333,
+  "styleName": "default"
+}

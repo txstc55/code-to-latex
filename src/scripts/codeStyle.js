@@ -104,7 +104,7 @@ class codeStyle {
     latexText += `showtabs=false, % do we indicate tabs within strings\n`;
     latexText += `tabsize=4, % sets default tabsize to 4 spaces\n`;
     latexText += `xleftmargin=0pt, % sets the margin on left side\n`;
-    latexText += `otherkeywords={${additionalKeywords.join(", ")}}, % add to this list if you want to add other keywords\n`;
+    latexText += `otherkeywords={}, % add to this list if you want to add other keywords\n`;
     latexText += `moredelim=[is][\\color{pythonParameterColor}]{|@}{@|},  % Anything between |@ @| strings will have parameter color\n`;
     latexText += `moredelim=[is][\\color{pythonFunctionColor}]{*|}{|*},  % Anything between *| |* strings will have function color\n`;
     latexText += `moredelim=[is][\\color{pythonCallColor}]{|!}{!|},  % Anything between |! !| strings will have call color\n`;
